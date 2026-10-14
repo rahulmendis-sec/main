@@ -59,12 +59,12 @@ svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.7;stroke
 .hint{color:var(--mute);font-size:.82rem;margin-top:10px}
 .hide{display:none!important}
 button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-.flip{perspective:900px;cursor:pointer;margin:6px 0}
-.fi{position:relative;min-height:220px;transition:transform .6s;transform-style:preserve-3d}
-.flip.on .fi{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:22px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);background:var(--bg);overflow:auto}
-.face.back{transform:rotateY(180deg);background:var(--okBg)}
-.face small{color:var(--mute);margin-bottom:8px}
+.flip{cursor:pointer;margin:6px 0;width:100%}
+.face{width:100%;min-height:230px;border-radius:14px;padding:24px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);background:var(--bg);font-size:1.05rem;line-height:1.55;animation:flipin .35s both}
+.face.back{background:var(--okBg);border-color:var(--ok)}
+.face .q{font-size:1.2rem;margin:0}
+.face small{color:var(--mute);margin-bottom:8px;display:block}
+@keyframes flipin{from{transform:rotateX(70deg);opacity:.2}to{transform:none;opacity:1}}
 .ringbox{display:grid;place-items:center;margin:4px 0 12px;position:relative}
 .ring{width:150px;height:150px;transform:rotate(-90deg)}
 .ring circle{fill:none;stroke-width:11;stroke-linecap:round}
@@ -377,23 +377,25 @@ function done() {
 
 function showCard() {
   const q = run.list[run.i];
-  const flip = el("div", { class: "flip", role: "button", tabindex: "0", "aria-label": "Flip card", onclick: toggle },
-    el("div", { class: "fi" },
-      el("div", { class: "face" }, el("small", {}, q.lec), el("p", { class: "q", style: "margin:0" }, q.q)),
-      el("div", { class: "face back" }, el("small", {}, "Model answer"), el("p", { style: "margin:0" }, q.a))));
-  const row = el("div", { class: "row" });
   let shown = false;
-  function toggle() {
-    shown = !shown; flip.classList.toggle("on", shown);
+  const face = el("div", { class: "face" });
+  const flip = el("div", { class: "flip", role: "button", tabindex: "0", "aria-label": "Flip card", onclick: toggle }, face);
+  const row = el("div", { class: "row" });
+  function paint() {
+    face.className = "face" + (shown ? " back" : "");
+    face.style.animation = "none"; void face.offsetWidth; face.style.animation = "";
+    face.replaceChildren(el("small", {}, shown ? "Model answer" : q.lec),
+      shown ? el("p", { style: "margin:0" }, q.a) : el("p", { class: "q" }, q.q));
     row.replaceChildren(...(shown ? [
       el("button", { class: "btn primary", onclick: know }, "I knew it"),
-      el("button", { class: "btn", onclick: again }, "Review again")] : [el("button", { class: "btn primary", onclick: toggle }, "Flip card")]));
+      el("button", { class: "btn", onclick: again }, "Review again")] : [el("button", { class: "btn primary", onclick: toggle }, "Show answer")]));
   }
+  function toggle() { shown = !shown; paint(); }
   const adv = () => { run.i++; run.i < run.list.length ? showCard() : cardsDone(); };
   const know = () => { run.known++; adv(); }, again = () => { run.again.push(q); adv(); };
   keys = e => { if (e.key === " ") { e.preventDefault(); toggle(); } else if (shown && e.key === "ArrowRight") know(); else if (shown && e.key === "ArrowLeft") again(); };
   flip.addEventListener("keydown", e => { if (e.key === "Enter") toggle(); });
-  row.append(el("button", { class: "btn primary", onclick: toggle }, "Flip card"));
+  paint();
   app.replaceChildren(el("div", { class: "card" }, topBar(), flip, row, el("p", { class: "hint" }, "Tip: Space flips the card; \u2192 means you knew it, \u2190 means review again.")));
 }
 
