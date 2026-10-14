@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Computer Systems Practice</title>
+<style>
+:root{--bg:#eaf3f1;--card:#fff;--ink:#14282c;--mute:#566a6f;--line:#cddcd9;--acc:#0f766e;--acc2:#14b8a6;--accInk:#fff;--ok:#15803d;--okBg:#dff3e5;--bad:#b42318;--badBg:#fce6e3;--warm:#f59e0b;--sh:0 6px 20px rgba(15,60,56,.10)}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1719;--card:#15262a;--ink:#e8f1f0;--mute:#9db3b7;--line:#29424a;--acc:#2dd4bf;--acc2:#0f766e;--accInk:#05302b;--ok:#4ade80;--okBg:#12301e;--bad:#f87171;--badBg:#3a1a18;--sh:0 6px 20px rgba(0,0,0,.35)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px 16px 56px}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.hero{position:relative;overflow:hidden;border-radius:18px;padding:26px 22px;color:#fff;background:linear-gradient(135deg,#0b5f59,#14b8a6);box-shadow:var(--sh);display:flex;align-items:center;gap:16px;justify-content:space-between}
+.hero h1{font:700 1.7rem/1.15 Georgia,"Iowan Old Style",serif;margin:0 0 6px}
+.hero p{margin:0;opacity:.92;max-width:34ch}
+.hero svg.art{flex:none;width:150px;height:auto}
+.float{animation:float 4s ease-in-out infinite}.float.d{animation-delay:-2s}
+@keyframes float{50%{transform:translateY(-7px)}}
+.bar2{display:flex;gap:8px;margin:18px 0 14px;flex-wrap:wrap;align-items:center}
+.bar2 span{color:var(--mute);margin-right:4px}
+.tog{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 16px;display:flex;gap:8px;align-items:center;transition:transform .15s,background .2s}
+.tog:hover{transform:translateY(-1px)}
+.tog[aria-pressed=true]{background:var(--acc);color:var(--accInk);border-color:var(--acc);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.lcard{font:inherit;text-align:left;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:center;box-shadow:var(--sh);transition:transform .18s,border-color .18s;animation:in .4s both}
+.lcard:hover{transform:translateY(-3px);border-color:var(--acc)}
+.lcard:active{transform:scale(.98)}
+.lcard .ic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:24px;background:var(--bg);color:var(--acc)}
+.lcard b{display:block;line-height:1.25}.lcard small{color:var(--mute)}
+.lcard.all{grid-column:1/-1;background:linear-gradient(135deg,var(--acc),var(--acc2));color:var(--accInk);border:0}
+.lcard.all .ic{background:rgba(255,255,255,.22);color:inherit}.lcard.all small{color:inherit;opacity:.85}
+.badge{margin-left:auto;font-size:.8rem;background:var(--okBg);color:var(--ok);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--sh);animation:in .35s both}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{font:inherit;cursor:pointer;border:0;background:var(--bg);color:var(--ink);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;font-size:18px}
+.prog{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:4px;transition:width .4s}
+.streak{font-weight:700;color:var(--warm);display:flex;gap:4px;align-items:center;min-width:48px;justify-content:flex-end}
+.streak.hot svg{animation:pop .5s}
+.tag{color:var(--mute);font-size:.88rem;margin:0 0 6px}
+.q{font:600 1.25rem/1.4 Georgia,"Iowan Old Style",serif;margin:0 0 16px}
+.opts{display:grid;gap:10px}
+.opt{font:inherit;text-align:left;cursor:pointer;width:100%;display:flex;gap:12px;align-items:center;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:12px;transition:transform .15s,border-color .2s,background .2s}
+.opt:hover:not(:disabled){border-color:var(--acc);transform:translateX(3px)}
+.opt kbd{flex:none;width:28px;height:28px;border-radius:8px;background:var(--bg);display:grid;place-items:center;font:600 .85rem system-ui}
+.opt.right{background:var(--okBg);border-color:var(--ok);animation:pop .4s}
+.opt.wrong{background:var(--badBg);border-color:var(--bad);animation:shake .4s}
+.opt:disabled{cursor:default}
+@keyframes pop{50%{transform:scale(1.04)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--bg);animation:in .3s both}
+.fb b.ok{color:var(--ok)}.fb b.no{color:var(--bad)}
+.row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{font:inherit;cursor:pointer;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 18px;transition:transform .15s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--acc);color:var(--accInk);border-color:var(--acc);font-weight:600}
+.hint{color:var(--mute);font-size:.82rem;margin-top:10px}
+.hide{display:none!important}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.flip{perspective:900px;cursor:pointer;margin:6px 0}
+.fi{position:relative;min-height:220px;transition:transform .6s;transform-style:preserve-3d}
+.flip.on .fi{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:22px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);background:var(--bg);overflow:auto}
+.face.back{transform:rotateY(180deg);background:var(--okBg)}
+.face small{color:var(--mute);margin-bottom:8px}
+.ringbox{display:grid;place-items:center;margin:4px 0 12px;position:relative}
+.ring{width:150px;height:150px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:11;stroke-linecap:round}
+.ring .bg{stroke:var(--line)}.ring .fg{stroke:var(--acc);stroke-dasharray:327;stroke-dashoffset:327;transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)}
+.pct{position:absolute;font:700 1.9rem Georgia,serif}
+.center{text-align:center}
+ul.rev{padding:0;list-style:none;display:grid;gap:8px;text-align:left}
+ul.rev li{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.95rem}
+ul.rev small{display:block;color:var(--ok)}
+.conf{position:fixed;top:-12px;width:9px;height:14px;z-index:9;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
+@media (max-width:520px){.hero svg.art{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+// Add more questions by copying the patterns below.
+// mcq: {q, o:[options], a:index of correct option, e:explanation}
+// tf:  {q, a:true|false, e:explanation}
+// sa:  {q, a:model answer}  (shown as flashcards)
+window.LECTURES = [
+{ title: "L1 History & Evolution of Computers",
+  mcq: [
+    { q: "What is the oldest known calculating device?", o: ["Pascal's calculator", "Abacus", "Difference engine", "Colossus"], a: 1, e: "The abacus was invented in Asia over 2000 years ago." },
+    { q: "Which were the first programmable electronic digital computers, built for WWII British codebreakers?", o: ["ENIAC", "UNIVAC", "LEO I", "Colossus"], a: 3, e: "Colossus Mark 1 ran in Feb 1944 and Mark 2 in June 1944." },
+    { q: "What was the main electronic component of second-generation computers?", o: ["Vacuum tube", "Transistor", "Integrated circuit", "Microprocessor"], a: 1, e: "Transistors made machines smaller, cooler and more reliable." },
+    { q: "Which computer was the first used for commercial business applications?", o: ["UNIVAC", "LEO I", "EDVAC", "IBM 650"], a: 1, e: "LEO I (Lyons Electronic Office). UNIVAC was the first commercially successful US computer." }
+  ],
+  tf: [
+    { q: "Colossus was the first general-purpose programmable computer in the United States.", a: false, e: "That was ENIAC. Colossus was British." },
+    { q: "Fifth-generation computers aim to support AI and natural language.", a: true, e: "They use ULSI, parallel processing and AI." }
+  ],
+  sa: [
+    { q: "Describe first-generation computers (component, memory, language, size, I/O, examples).", a: "Vacuum tubes; magnetic drums/tapes; machine language; very large, slow, hot; punched cards and paper tape; ENIAC, UNIVAC I, EDVAC, IBM 650/701." },
+    { q: "Give the time periods of the five generations.", a: "1st 1940-1956; 2nd 1956-1963; 3rd 1964-1971; 4th 1971-present; 5th present and beyond." }
+  ] },
+{ title: "L2 Classes of Computers",
+  mcq: [
+    { q: "What is the order of the information processing cycle?", o: ["Decode, Fetch, Store, Execute", "Fetch, Decode, Execute, Store", "Fetch, Execute, Decode, Store", "Store, Fetch, Decode, Execute"], a: 1, e: "Fetch, Decode, Execute, Store." },
+    { q: "The key idea of the Von Neumann architecture is that:", o: ["Programs and data share the same memory", "Programs are stored only on disk", "Each core has its own memory", "Data is stored in decimal"], a: 0, e: "This is the stored-program concept." },
+    { q: "Which class of computer is the largest, fastest and most expensive?", o: ["Mainframe", "Minicomputer", "Supercomputer", "Microcomputer"], a: 2, e: "Examples: CRAY, Tianhe-2, Summit." },
+    { q: "In which network does each host act as both client and server?", o: ["Client-server", "Peer-to-peer", "Star", "Mainframe"], a: 1, e: "Peer-to-peer hosts have equal status." }
+  ],
+  tf: [
+    { q: "Microcomputers are single-user systems.", a: true, e: "Desktops and laptops are examples." },
+    { q: "In a client-server network, the server makes requests to the clients.", a: false, e: "Clients request; servers respond." }
+  ],
+  sa: [
+    { q: "Define a computer.", a: "A programmable electronic device that accepts raw data as input and processes it with a program to produce output." },
+    { q: "Distinguish mainframes from supercomputers.", a: "Supercomputers have world-class computational capacity for complex scientific work and are the largest and costliest. Mainframes are cheaper, smaller and slower, built for bulk transaction processing for 100+ users." }
+  ] },
+{ title: "L3 Social Effects & Computer Components",
+  mcq: [
+    { q: "Processor clock speed is measured in:", o: ["Bytes", "Gigahertz (GHz)", "Pixels", "Watts"], a: 1, e: "1 GHz is one billion cycles per second." },
+    { q: "RAM is called volatile because:", o: ["It is slow", "Its contents are erased when power is off", "It cannot be written to", "It is permanent"], a: 1, e: "Secondary storage is non-volatile." },
+    { q: "Which is NOT one of the five basic computer operations?", o: ["Take input", "Store data", "Compile data", "Control the workflow"], a: 2, e: "The five: input, store, process, output, control." },
+    { q: "A bus is:", o: ["A set of circuits routing data and instructions between components", "A storage drive", "A display type", "A memory chip"], a: 0, e: "Examples: data bus, address bus, USB." }
+  ],
+  tf: [
+    { q: "Flash drives have an integrated USB interface.", a: true, e: "Flash drives are secondary storage with USB." },
+    { q: "Computer memory (RAM) is non-volatile.", a: false, e: "RAM is volatile." }
+  ],
+  sa: [
+    { q: "List the seven basic computer components.", a: "Processor, memory, secondary storage, input devices, output devices, communication devices, bus." },
+    { q: "Differentiate primary memory from secondary storage.", a: "Primary memory (RAM) holds data in use and is volatile. Secondary storage (hard disk, optical, flash) keeps data between sessions and is non-volatile." }
+  ] },
+{ title: "L4 Computer Software",
+  mcq: [
+    { q: "System software is divided into:", o: ["Operating systems and utility programs", "Games and browsers", "Drivers and spreadsheets", "Compilers and editors"], a: 0, e: "OS and utilities." },
+    { q: "Which OS type controls jet engines, air bags and anti-lock brakes?", o: ["Multiuser", "Real-time", "Multithreading", "Multiprocessing"], a: 1, e: "It can interrupt any task for a higher-priority one." },
+    { q: "A program that controls a particular device for the OS is a:", o: ["Utility", "Device driver", "Compiler", "Suite"], a: 1, e: "Drivers hide hardware details from the OS." },
+    { q: "Which is true of application software?", o: ["It runs independently", "It is necessary for the system to function", "It needs system software to run", "It is written in machine code"], a: 2, e: "Applications depend on system software." }
+  ],
+  tf: [
+    { q: "System software is generally written in high-level languages such as Python.", a: false, e: "It is generally low-level." },
+    { q: "Scalability is the ability to handle more concurrent users smoothly.", a: true, e: "It relates to multiuser OS." }
+  ],
+  sa: [
+    { q: "Explain the five approaches to task management in operating systems.", a: "Multiuser, multiprocessing (more than one CPU), multitasking (several programs), multithreading (threads of one program), real time (instant response)." },
+    { q: "Differentiate CLI from GUI.", a: "CLI: the user types commands. GUI: users interact with icons and visual indicators, introduced to ease the CLI learning curve." }
+  ] },
+{ title: "L5 The System Unit",
+  mcq: [
+    { q: "Which PS/2 connector colour is for the keyboard?", o: ["Green", "Purple", "Pink", "Blue"], a: 1, e: "Green is for the mouse." },
+    { q: "The principal components of a CPU are:", o: ["ALU, registers, control unit", "RAM, ROM, cache", "Bus, port, bay", "Hub, switch, router"], a: 0, e: "Most modern CPUs are microprocessors on a single IC." },
+    { q: "Which cache level is embedded in the CPU, fastest and smallest?", o: ["L1", "L2", "L3", "L4"], a: 0, e: "L3 is slower and shared across cores." },
+    { q: "Which memory is non-volatile and holds start-up instructions?", o: ["RAM", "DRAM", "ROM", "Cache"], a: 2, e: "ROM keeps its contents without power." }
+  ],
+  tf: [
+    { q: "PROM holds data and instructions that can never be changed.", a: true, e: "Per the notes. EEPROM can be reprogrammed." },
+    { q: "CISC lets programs be written with fewer instructions.", a: true, e: "It has a larger, more complex instruction set." }
+  ],
+  sa: [
+    { q: "Explain the stages of the instruction cycle.", a: "Fetch (instruction into the IR, PC updated), decode, obtain necessary data, execute, store results; then repeat." },
+    { q: "Differentiate RAM from ROM.", a: "RAM is volatile, temporary read/write working storage. ROM is non-volatile permanent storage for unchanging data such as start-up instructions." }
+  ] },
+{ title: "L6 Issues Related to Software",
+  mcq: [
+    { q: "A software bug is:", o: ["A virus", "A defect that stops a program performing as users expect", "A software upgrade", "A licence"], a: 1, e: "Some bugs are subtle, others crash programs." },
+    { q: "Installing a single-use licence on multiple computers is:", o: ["Plagiarism", "Software piracy", "Cyberbullying", "Hacking"], a: 1, e: "Piracy violates copyright or licence terms." },
+    { q: "Open-source software:", o: ["Hides its source code", "Provides source code that users can study, change and improve", "Always costs money", "Cannot be modified"], a: 1, e: "Examples: Linux, Firefox, GIMP, MySQL." },
+    { q: "Viruses usually spread when:", o: ["A user shares an infected file or attachment", "The monitor is off", "RAM is full", "A printer is attached"], a: 0, e: "They spread by the action of the infected computer's user." }
+  ],
+  tf: [
+    { q: "Freeware gives users full access to the source code.", a: false, e: "Access to its source code is limited." },
+    { q: "Registering software helps you receive bug alerts, fixes and patches.", a: true, e: "It is one tip for reducing the impact of bugs." }
+  ],
+  sa: [
+    { q: "Give four tips for reducing the impact of software bugs.", a: "Register software; check manuals/read-me files; use the support site for patches; install updates; reproduce the bug before reporting; consider waiting before buying the newest release." },
+    { q: "How can you avoid plagiarism?", a: "Track your sources, paraphrase or quote and add your own ideas, credit authors in-text and in a reference list, and use a plagiarism checker." }
+  ] },
+{ title: "L7 Computer Security",
+  mcq: [
+    { q: "Which measure helps ensure data integrity?", o: ["Hashing", "Load balancing", "Firewalls", "Phishing training"], a: 0, e: "Regular, verified backups also help." },
+    { q: "A Denial of Service attack mainly threatens:", o: ["Confidentiality", "Integrity", "Availability", "Authentication"], a: 2, e: "Redundancy, failover and load balancers help." },
+    { q: "An unpatched system is an example of a:", o: ["Threat", "Vulnerability", "Risk", "Attack"], a: 1, e: "A vulnerability is a weakness a threat can exploit." },
+    { q: "Which layer is described as the weakest link?", o: ["Network", "Perimeter", "The human layer", "Data"], a: 2, e: "Training and phishing awareness protect this layer." }
+  ],
+  tf: [
+    { q: "An attack is a threat that is carried out.", a: true, e: "A threat is only a potential danger until acted on." },
+    { q: "Humans are the strongest layer in cyber security.", a: false, e: "They are the weakest link." }
+  ],
+  sa: [
+    { q: "Explain confidentiality, integrity and availability with a measure for each.", a: "Confidentiality: no disclosure to unauthorised parties (encryption, access control, MFA). Integrity: no unauthorised modification (hashing, backups). Availability: access when needed (redundancy, failover, load balancers)." },
+    { q: "Differentiate vulnerability, threat and risk.", a: "Vulnerability: a weakness. Threat: a potential danger that could exploit it. Risk: the potential loss when a threat exploits a vulnerability (data breach, financial loss, reputation damage)." }
+  ] },
+{ title: "L8 Internet, WWW & Cloud",
+  mcq: [
+    { q: "The Internet originated as a project of:", o: ["NASA", "DARPA", "IBM", "CERN"], a: 1, e: "It first linked four nodes in 1964." },
+    { q: "Which statement is correct?", o: ["The WWW and the Internet are the same", "The WWW is one of many Internet services", "The Internet is a service of the WWW", "Email is part of the WWW only"], a: 1, e: "Email, FTP and VoIP are other services." },
+    { q: "Which protocol suits Internet telephony because it tolerates occasional packet loss?", o: ["TCP", "UDP", "FTP", "HTTP"], a: 1, e: "TCP gives reliable, ordered, error-checked delivery." },
+    { q: "Which cloud service model provides servers, storage and networking?", o: ["SaaS", "PaaS", "IaaS", "DaaS"], a: 2, e: "PaaS gives a platform; SaaS gives web-based software." }
+  ],
+  tf: [
+    { q: "Wikis are designed to avoid mistakes rather than make them easy to correct.", a: false, e: "They make mistakes easy to correct." },
+    { q: "Webcasting refers to live streaming, while podcasting makes media files available.", a: true, e: "Webcasts can also be on demand." }
+  ],
+  sa: [
+    { q: "Distinguish the Internet, an intranet and an extranet.", a: "Internet: public global network. Intranet: private network within an organisation. Extranet: lets authorised outsiders (customers, partners, suppliers) reach parts of the intranet." },
+    { q: "State the five characteristics of cloud computing.", a: "On-demand self-service, broad network access, resource pooling, rapid elasticity, measured service." }
+  ] },
+{ title: "L9 Computer Networks",
+  mcq: [
+    { q: "In a star topology, if the central hub fails:", o: ["Only one device is affected", "All devices lose communication", "Nothing happens", "Only wireless devices fail"], a: 1, e: "A single link failure isolates only that device." },
+    { q: "Which topology is the most robust, routing around failed nodes?", o: ["Star", "Bus", "Mesh", "Ring"], a: 2, e: "Mesh examples: Google Wifi, Zigbee." },
+    { q: "Which wireless technology works within a few inches, e.g. for payments?", o: ["Bluetooth", "NFC", "Wi-Fi", "Infrared only"], a: 1, e: "Bluetooth covers about 10-30 feet." },
+    { q: "A network spanning a campus or city is a:", o: ["PAN", "LAN", "MAN", "WAN"], a: 2, e: "A WAN covers large geographic regions." }
+  ],
+  tf: [
+    { q: "A bridge connects LANs that use different protocols.", a: false, e: "A bridge connects LANs using the same protocol." },
+    { q: "In a mesh network, if one node fails the others can still communicate.", a: true, e: "Messages hop around blocked paths." }
+  ],
+  sa: [
+    { q: "Compare star, bus and mesh topologies.", a: "Star: central hub/switch; hub failure stops all. Bus: shared backbone, all devices see broadcasts. Mesh: nodes hop messages over multiple paths, very robust." },
+    { q: "Differentiate PAN, LAN, MAN and WAN.", a: "PAN: around one person. LAN: office, home or building. MAN: campus or city. WAN: large geographic regions." }
+  ] }
+];
+
+</script>
+<script>
+const L = window.LECTURES;
+const P = {
+  all:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  0:'<path d="M4 4h16M4 20h16M7 4v16M17 4v16"/><circle cx="7" cy="9" r="1.2"/><circle cx="7" cy="14" r="1.2"/><circle cx="17" cy="9" r="1.2"/><circle cx="17" cy="14" r="1.2"/>',
+  1:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  2:'<rect x="7" y="7" width="10" height="10" rx="1"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+  3:'<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/>',
+  4:'<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 7h6M9 11h6"/><circle cx="12" cy="17" r="1"/>',
+  5:'<path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z"/>',
+  6:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  7:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+  8:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v5l-6 6M12 12l6 6"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>', flame:'<path d="M12 3c1 4 5 6 5 11a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-4-1-6 1-10z"/>',
+  quiz:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17v.1"/>',
+  cards:'<rect x="3" y="6" width="14" height="12" rx="2"/><path d="M7 3h12a2 2 0 012 2v10"/>'
+};
+const ic = k => '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + P[k] + '</svg>';
+const $ = (s, r = document) => r.querySelector(s);
+const app = $("#app");
+let cfg = { mode: "quiz" }, run = null, keys = null;
+
+function el(tag, props = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => n.append(c));
+  return n;
+}
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const store = {
+  get(k) { try { return localStorage.getItem("cs2_" + k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem("cs2_" + k, v); } catch (e) {} }
+};
+document.addEventListener("keydown", e => { if (keys && !e.metaKey && !e.ctrlKey) keys(e); });
+
+const hero = '<svg class="art" viewBox="0 0 160 120" aria-hidden="true"><g class="float"><rect x="30" y="20" width="100" height="66" rx="8" fill="#fff" opacity=".95"/><rect x="38" y="28" width="84" height="50" rx="4" fill="#0b5f59"/><path d="M48 44h30M48 54h50M48 64h20" stroke="#5eead4" stroke-width="4" stroke-linecap="round"/><path d="M18 92h124l-10 12H28z" fill="#fff" opacity=".85"/></g><g class="float d"><circle cx="140" cy="24" r="10" fill="#fde68a"/><path d="M135 24l4 4 7-8" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="8" y="34" width="18" height="18" rx="5" fill="#99f6e4"/></g></svg>';
+
+function count(i) {
+  const l = L[i];
+  return cfg.mode === "quiz" ? l.mcq.length + l.tf.length : l.sa.length;
+}
+function pool(lec) {
+  const idx = lec === "all" ? L.map((_, i) => i) : [lec];
+  const items = [];
+  idx.forEach(i => {
+    const l = L[i];
+    if (cfg.mode === "quiz") {
+      l.mcq.forEach(q => items.push({ ...q, kind: "mcq", lec: l.title }));
+      l.tf.forEach(q => items.push({ ...q, kind: "tf", lec: l.title }));
+    } else l.sa.forEach(q => items.push({ ...q, kind: "sa", lec: l.title }));
+  });
+  return shuffle(items);
+}
+
+function home() {
+  run = null; keys = null;
+  const mk = (m, label) => el("button", { class: "tog", "aria-pressed": cfg.mode === m, onclick: () => { cfg.mode = m; home(); }, html: ic(m) + label });
+  const card = (lec, i) => {
+    const b = lec === "all" ? null : store.get("best_" + lec);
+    const n = lec === "all" ? L.reduce((s, _, k) => s + count(k), 0) : count(lec);
+    return el("button", { class: "lcard" + (lec === "all" ? " all" : ""), style: "animation-delay:" + i * 40 + "ms", onclick: () => start(lec) },
+      el("span", { class: "ic", html: ic(lec) }),
+      el("span", {}, el("b", {}, lec === "all" ? "Mix of all lectures" : L[lec].title),
+        el("small", {}, n + (cfg.mode === "quiz" ? " questions" : " cards"))),
+      b ? el("span", { class: "badge" }, "Best " + b + "%") : "");
+  };
+  app.replaceChildren(
+    el("section", { class: "hero" }, el("div", {}, el("h1", {}, "Computer Systems Practice"), el("p", {}, "Choose a mode, tap a lecture, and learn with instant feedback.")), el("span", { html: hero })),
+    el("div", { class: "bar2" }, el("span", {}, "Mode"), mk("quiz", "Quiz"), mk("cards", "Flashcards")),
+    el("div", { class: "grid" }, card("all", 0), L.map((_, i) => card(i, i + 1))));
+}
+
+function start(lec, items) {
+  run = { lec, list: items || pool(lec), i: 0, score: 0, wrong: [], known: 0, again: [], streak: 0 };
+  cfg.mode === "quiz" ? showQ() : showCard();
+}
+function topBar() {
+  const pct = run.i / run.list.length * 100;
+  return el("div", { class: "top" },
+    el("button", { class: "back", "aria-label": "Back to lectures", onclick: home, html: ic("back") }),
+    el("div", { class: "prog", role: "progressbar", "aria-valuenow": Math.round(pct), "aria-valuemin": 0, "aria-valuemax": 100 }, el("i", { style: "width:" + pct + "%" })),
+    cfg.mode === "quiz" ? el("span", { class: "streak" + (run.streak > 1 ? " hot" : ""), title: "Correct in a row", html: ic("flame") + run.streak }) : el("span", { class: "streak", style: "color:var(--mute)" }, (run.i + 1) + "/" + run.list.length));
+}
+
+function showQ() {
+  const q = run.list[run.i];
+  const opts = q.kind === "tf" ? ["True", "False"] : q.o;
+  const correct = q.kind === "tf" ? (q.a ? 0 : 1) : q.a;
+  let answered = false;
+  const box = el("div", { class: "opts" });
+  const fb = el("div", { class: "fb hide", "aria-live": "polite" });
+  const next = el("button", { class: "btn primary hide", onclick: go }, run.i + 1 < run.list.length ? "Next question" : "See results");
+  function go() { run.i++; run.i < run.list.length ? showQ() : done(); }
+  function pick(k) {
+    if (answered) return; answered = true;
+    const ok = k === correct;
+    if (ok) { run.score++; run.streak++; } else { run.wrong.push(q); run.streak = 0; }
+    [...box.children].forEach((c, j) => { c.disabled = true; if (j === correct) c.classList.add("right"); else if (j === k) c.classList.add("wrong"); });
+    const s = $(".streak"); s.className = "streak" + (run.streak > 1 ? " hot" : ""); s.innerHTML = ic("flame") + run.streak;
+    fb.replaceChildren(el("b", { class: ok ? "ok" : "no" }, ok ? "Correct! " : "Not quite. "), q.e || "");
+    fb.classList.remove("hide"); next.classList.remove("hide"); next.focus();
+  }
+  opts.forEach((t, k) => box.append(el("button", { class: "opt", onclick: () => pick(k) }, el("kbd", {}, q.kind === "tf" ? (k ? "F" : "T") : "ABCD"[k]), t)));
+  keys = e => {
+    const kk = e.key.toLowerCase();
+    if (!answered) { const i = q.kind === "tf" ? ["t", "f"].indexOf(kk) : ["a", "b", "c", "d", "1", "2", "3", "4"].indexOf(kk) % 4; if (i >= 0 && i < opts.length && (q.kind === "tf" ? true : kk !== "enter")) pick(i); }
+    else if (e.key === "Enter" || e.key === "ArrowRight") { e.preventDefault(); go(); }
+  };
+  app.replaceChildren(el("div", { class: "card" }, topBar(), el("p", { class: "tag" }, q.lec), el("p", { class: "q" }, (q.kind === "tf" ? "True or false: " : "") + q.q), box, fb, el("div", { class: "row" }, next),
+    el("p", { class: "hint" }, q.kind === "tf" ? "Tip: press T or F, then Enter for next." : "Tip: press A\u2013D to answer, then Enter for next.")));
+}
+
+function confetti() {
+  if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const c = ["#14b8a6", "#f59e0b", "#60a5fa", "#f472b6", "#a3e635"];
+  for (let i = 0; i < 40; i++) {
+    const d = el("i", { class: "conf", style: "left:" + Math.random() * 100 + "vw;background:" + c[i % 5] + ";animation-duration:" + (1.8 + Math.random() * 1.6) + "s;animation-delay:" + Math.random() * .5 + "s" });
+    document.body.append(d); setTimeout(() => d.remove(), 4200);
+  }
+}
+
+function done() {
+  keys = null;
+  const pct = Math.round(run.score / run.list.length * 100);
+  const key = run.lec === "all" ? "all" : "best_" + run.lec;
+  const prev = Number(store.get(run.lec === "all" ? "best_all" : key) || 0);
+  const bk = run.lec === "all" ? "best_all" : key;
+  const isBest = pct > prev; if (isBest) store.set(bk, pct);
+  const msg = pct === 100 ? "Perfect score!" : pct >= 80 ? "Great work!" : pct >= 50 ? "Good effort. Review the misses and try again." : "Keep going. Retry the missed ones.";
+  const ringBox = el("div", { class: "ringbox", html: '<svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" cx="60" cy="60" r="52"/></svg><span class="pct">'+pct+'%</span>' });
+  const fg = ringBox.querySelector(".fg");
+  app.replaceChildren(el("div", { class: "card center" },
+    ringBox,
+    el("h2", { style: "margin:0 0 4px;font-family:Georgia,serif" }, msg),
+    el("p", { class: "tag" }, run.score + " of " + run.list.length + " correct" + (isBest && prev ? " \u2013 new best!" : "")),
+    run.wrong.length ? el("ul", { class: "rev" }, run.wrong.map(q => el("li", {}, q.q, el("small", {}, "Answer: " + (q.kind === "tf" ? (q.a ? "True" : "False") : q.o[q.a]))))) : "",
+    el("div", { class: "row", style: "justify-content:center" },
+      run.wrong.length ? el("button", { class: "btn primary", onclick: () => start(run.lec, shuffle(run.wrong)) }, "Retry missed (" + run.wrong.length + ")") : "",
+      el("button", { class: run.wrong.length ? "btn" : "btn primary", onclick: () => start(run.lec) }, "New round"),
+      el("button", { class: "btn", onclick: home }, "All lectures"))));
+  requestAnimationFrame(() => requestAnimationFrame(() => fg.style.strokeDashoffset = 327 * (1 - pct / 100)));
+  if (pct >= 80) confetti();
+}
+
+function showCard() {
+  const q = run.list[run.i];
+  const flip = el("div", { class: "flip", role: "button", tabindex: "0", "aria-label": "Flip card", onclick: toggle },
+    el("div", { class: "fi" },
+      el("div", { class: "face" }, el("small", {}, q.lec), el("p", { class: "q", style: "margin:0" }, q.q)),
+      el("div", { class: "face back" }, el("small", {}, "Model answer"), el("p", { style: "margin:0" }, q.a))));
+  const row = el("div", { class: "row" });
+  let shown = false;
+  function toggle() {
+    shown = !shown; flip.classList.toggle("on", shown);
+    row.replaceChildren(...(shown ? [
+      el("button", { class: "btn primary", onclick: know }, "I knew it"),
+      el("button", { class: "btn", onclick: again }, "Review again")] : [el("button", { class: "btn primary", onclick: toggle }, "Flip card")]));
+  }
+  const adv = () => { run.i++; run.i < run.list.length ? showCard() : cardsDone(); };
+  const know = () => { run.known++; adv(); }, again = () => { run.again.push(q); adv(); };
+  keys = e => { if (e.key === " ") { e.preventDefault(); toggle(); } else if (shown && e.key === "ArrowRight") know(); else if (shown && e.key === "ArrowLeft") again(); };
+  flip.addEventListener("keydown", e => { if (e.key === "Enter") toggle(); });
+  row.append(el("button", { class: "btn primary", onclick: toggle }, "Flip card"));
+  app.replaceChildren(el("div", { class: "card" }, topBar(), flip, row, el("p", { class: "hint" }, "Tip: Space flips the card; \u2192 means you knew it, \u2190 means review again.")));
+}
+
+function cardsDone() {
+  keys = null;
+  app.replaceChildren(el("div", { class: "card center" },
+    el("h2", { style: "margin:0 0 6px;font-family:Georgia,serif" }, run.known + " of " + run.list.length + " cards known"),
+    el("p", { class: "tag" }, run.again.length ? "Review the others to lock them in." : "You know them all."),
+    el("div", { class: "row", style: "justify-content:center" },
+      run.again.length ? el("button", { class: "btn primary", onclick: () => start(run.lec, shuffle(run.again)) }, "Review again (" + run.again.length + ")") : "",
+      el("button", { class: "btn", onclick: () => start(run.lec) }, "New round"),
+      el("button", { class: "btn", onclick: home }, "All lectures"))));
+  if (!run.again.length) confetti();
+}
+home();
+</script>
+</body>
+</html>
